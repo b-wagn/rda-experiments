@@ -17,6 +17,7 @@
                 title={Corruption Graph},
                 grid=major,
                 legend pos=north east,
+                mark repeat=30 % Fewer markers (every 30th point)
             ]
             \addplot table [x=Time_Step, y=Corruption_Rows_1, col sep=comma] {simulation_data.csv}; \addlegendentry{Rows=1};
             \addplot table [x=Time_Step, y=Corruption_Rows_5, col sep=comma] {simulation_data.csv}; \addlegendentry{Rows=5};
@@ -35,6 +36,7 @@
                 title={Connection Graph},
                 grid=major,
                 legend pos=north east,
+                mark repeat=30 % Fewer markers (every 30th point)
             ]
             \addplot table [x=Time_Step, y=Connections_Rows_1, col sep=comma] {simulation_data.csv}; \addlegendentry{Rows=1};
             \addplot table [x=Time_Step, y=Connections_Rows_5, col sep=comma] {simulation_data.csv}; \addlegendentry{Rows=5};
