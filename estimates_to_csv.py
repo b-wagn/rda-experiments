@@ -1,6 +1,14 @@
 import math
 import csv
 
+SECONDS_PER_ROUND = 4
+SECONDS_PER_HOUR = 3600
+SECONDS_PER_YEAR = 31557600
+
+T_ROUNDS = int(10 * SECONDS_PER_YEAR / SECONDS_PER_ROUND)
+DELTA_OVERLAP_ROUNDS = int(6 * SECONDS_PER_HOUR / SECONDS_PER_ROUND)
+DELTA_OVERLAP_MIN_ROUNDS = 450
+
 def binary_entropy(epsilon: float) -> float:
     """
     Calculates the binary entropy function h(ε) = -ε log₂(ε) - (1-ε)log₂(1-ε)
@@ -34,7 +42,7 @@ def calculate_rhs(
 ) -> float:
     """
     Calculates the right hand side of the inequality:
-    δ ≤ δ_SD + ⌈(T+3)/(Δ_overlap - Δ_overlap,min + 1)⌉ · (k₁2^(h(ε)k₂)e^(-εN/k₁) + k₂e^(-N/k₂))
+    δ ≤ δ_SD + ⌈(T+2)/(Δ_overlap - Δ_overlap,min + 1)⌉ · (k₁2^(h(ε)k₂)e^(-εN/k₁) + k₂e^(-N/k₂))
 
     Args:
         delta_sd: The δ_SD value
@@ -80,15 +88,6 @@ def find_max_k1(k2: int, epsilon: float, N: int, target_delta: float = 1e-9) -> 
     Returns:
         The largest valid k1 value
     """
-    # Time parameters (fixed as per requirements)
-    SECONDS_PER_ROUND = 4
-    SECONDS_PER_HOUR = 3600
-    SECONDS_PER_YEAR = 31557600
-
-    T_rounds = int(10 * SECONDS_PER_YEAR / SECONDS_PER_ROUND)
-    delta_overlap_rounds = int(6 * SECONDS_PER_HOUR / SECONDS_PER_ROUND)
-    delta_overlap_min_rounds = 4
-
     # Binary search for k1
     left, right = 1, 10000  # Reasonable range for k1
     best_k1 = None
@@ -97,9 +96,9 @@ def find_max_k1(k2: int, epsilon: float, N: int, target_delta: float = 1e-9) -> 
         mid = (left + right) // 2
         result = calculate_rhs(
             delta_sd=0.0,
-            T=T_rounds,
-            delta_overlap=delta_overlap_rounds,
-            delta_overlap_min=delta_overlap_min_rounds,
+            T=T_ROUNDS,
+            delta_overlap=DELTA_OVERLAP_ROUNDS,
+            delta_overlap_min=DELTA_OVERLAP_MIN_ROUNDS,
             k1=mid,
             k2=k2,
             epsilon=epsilon,
@@ -128,15 +127,6 @@ def find_max_k2_with_k1_1(epsilon: float, N: int, target_delta: float = 1e-9) ->
     Returns:
         The largest valid k2 value
     """
-    # Time parameters (fixed as per requirements)
-    SECONDS_PER_ROUND = 4
-    SECONDS_PER_HOUR = 3600
-    SECONDS_PER_YEAR = 31557600
-
-    T_rounds = int(10 * SECONDS_PER_YEAR / SECONDS_PER_ROUND)
-    delta_overlap_rounds = int(6 * SECONDS_PER_HOUR / SECONDS_PER_ROUND)
-    delta_overlap_min_rounds = 30 * 60 / SECONDS_PER_ROUND # say roughly 15 minutes for sync
-
     # Binary search for k2
     left, right = 1, 2000  # Increased range for k2
     best_k2 = None
@@ -145,9 +135,9 @@ def find_max_k2_with_k1_1(epsilon: float, N: int, target_delta: float = 1e-9) ->
         mid = (left + right) // 2
         result = calculate_rhs(
             delta_sd=0.0,
-            T=T_rounds,
-            delta_overlap=delta_overlap_rounds,
-            delta_overlap_min=delta_overlap_min_rounds,
+            T=T_ROUNDS,
+            delta_overlap=DELTA_OVERLAP_ROUNDS,
+            delta_overlap_min=DELTA_OVERLAP_MIN_ROUNDS,
             k1=1,  # Fixed to 1
             k2=mid,
             epsilon=epsilon,

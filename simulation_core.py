@@ -23,7 +23,7 @@ class PartyGrid:
 
         # now the party becomes a peer of other nodes
         # namely, all nodes in the same column
-        # and all nodes in the same column
+        # and all nodes in the same row
         for other_row in range(self.k1):
             self.cells_to_peers[other_row][col] += 1
         for other_col in range(self.k2):
@@ -147,6 +147,7 @@ def generate_schedule(n_init: int, n_warmup: int, churn: int, steps: int) -> Lis
     for _ in range(n_warmup):
         # let a new party join in that time step
         step_event = [Event("join", JoinEvent(party_counter))]
+        active_parties.append(party_counter)
         party_counter += 1
         schedule.append(step_event)
 
